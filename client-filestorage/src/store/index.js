@@ -1,51 +1,44 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import axios from "@/axios";
-
-Vue.use(Vuex)
+import Vuex from "vuex";
+import api from "@/axios";
+import createPersistedState from "vuex-persistedstate";
 
 export default new Vuex.Store({
+  plugins: [createPersistedState()],
   state: {
-    userFiles: [],
-    hasOpenSession: false,
+    files: {},
+    isAuth: false,
   },
   mutations: {
-    setUserFiles(state, files) {
-      state.userFiles = [...files]
+    setFiles(state, files) {
+      state.files = [...files];
     },
-    setHasOpenSession(state, val) {
-      state.hasOpenSession = !!val
-    }
+    hasAuth(state, val) {
+      state.isAuth = !!val;
+    },
   },
   actions: {
-    login({commit}, {username, password}) {
-      return axios
-        .post("/login", {username, password})
-        .then(() => commit("setHasOpenSession", true))
+    login({ commit }, { username, password }) {
+      return api
+        .post("/token/", { username, password })
+        .then((response) => {
+          const token = response.data.access;
+          localStorage.setItem("token", token);
+        })
+        .then(() => commit("hasAuth", true));
     },
-    logout({commit}) {
-      return axios.post('/logout')
-        .then(() => commit('setHasOpenSession', false))
-        .then(deleteAllCookies)
-        .catch(console.error)
+    logout({ commit }) {
+      return api
+        .post("/logout")
+        .then(() => localStorage.removeItem("token"))
+        .then(() => commit("hasAuth", false))
+        .then(this.$router.push("/login"))
+        .catch(console.error);
     },
-    getUserFiles({commit}) {
-      return axios.get('/files')
-        .then(res => {
-          commit('setUserFiles', res.data)
-          console.log(res)
-        });
-    }
-  }
-})
-
-function deleteAllCookies() {
-//   var cookies = document.cookie.split(";");
-
-//   for (var i = 0; i < cookies.length; i++) {
-//       var cookie = cookies[i];
-//       var eqPos = cookie.indexOf("=");
-//       var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-//       document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-//   }
-}
+    getFiles({ commit }) {
+      return api.get("/files.json").then((res) => {
+        commit("setFiles", res.data);
+        console.log(res);
+      });
+    },
+  },
+});

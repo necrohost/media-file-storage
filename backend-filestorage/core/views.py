@@ -5,6 +5,7 @@ from django.http import FileResponse
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import File
 from .serializers import FileSerializer, UserSerializer
@@ -21,7 +22,8 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class FileViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all().order_by('-upload_at')
     serializer_class = FileSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     @action(detail=True)
     def share(self, request, *args, **kwargs):

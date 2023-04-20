@@ -1,31 +1,33 @@
+<template>
+  <div class="app-container">
+    <div>
+      <Navigator />
+    </div>
+    <div :style="{ 'margin-left': sidebarWidth }">
+      <RouterView />
+    </div>
+  </div>
+</template>
 <script>
-import {RouterLink, RouterView} from 'vue-router'
-import Navigator from './components/navbar/Navigator.vue'
-import {sidebarWidth} from './components/navbar/state'
-import '@fortawesome/fontawesome-free/js/all'
-import Header from "@/views/Header.vue";
+import "@fortawesome/fontawesome-free/js/all";
+import { sidebarWidth } from "./components/navbar/state";
+import Navigator from "@/components/navbar/Navigator.vue";
 
 export default {
-    data() {
-        return {
-            isAuth: true,
-        }
+  components: { Navigator },
+  data() {
+    return {};
+  },
+  mounted() {},
+  methods: {
+    logout() {
+      localStorage.removeItem("token");
+      this.$router.push("/login");
     },
-    components: {Header, Navigator},
-    setup() {
-        return {sidebarWidth}
-    }
-}
+  },
+  setup() {
+    return { sidebarWidth };
+  },
+};
 </script>
-
-<template>
-
-    <Navigator v-if="isAuth"/>
-    <router-link to="register">Reg</router-link>
-    <div :style="{ 'margin-left': sidebarWidth }">
-        <RouterView/>
-    </div>
-</template>
-
-<style scoped>
-</style>
+<style scoped></style>

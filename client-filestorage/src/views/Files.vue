@@ -15,7 +15,7 @@
           <!-- Loop through the list get the each student data -->
           <tr v-for="file in userFiles" :key="file">
             <td v-for="field in fields" :key="field">{{ file[field] }}</td>
-        </tr>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -23,26 +23,38 @@
 </template>
 
 <script>
-import axios from "axios";
+import api from "@/axios";
 import { collapsed, toggleNav } from "@/components/navbar/state";
+import { mapActions, mapState } from "vuex";
 export default {
   name: "FilesPage",
   setup() {
-    const fields = [ 'name','upload_at', 'size', 'file' ]
+    const fields = ["name", "upload_at", "size", "ext", "file"];
     return { collapsed, toggleNav, fields };
   },
   data() {
     return {
       info: null,
-      userFiles: [],
+      userFiles: {},
     };
   },
-  computed: {},
-  methods: {},
+  computed: {
+    ...mapState(["files"]),
+  },
+  methods: {
+    ...mapActions(["getFiles"]),
+  },
+  created() {
+    this.getFiles().catch((e) => {
+      this.$notify({
+        type: "error",
+        title: "Could not get files, try again later",
+        text: e.message ? e.message : null,
+      });
+    });
+  },
   mounted() {
-    axios
-      .get("http://127.0.0.1:8000/files.json")
-      .then((response) => (this.userFiles = response.data));
+    this.userFiles = this.files;
   },
 };
 </script>

@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 
 urlpatterns = [
-    path('', include('core.urls')),
+    path('api/', include('core.urls')),
     path('api-auth/', include('rest_framework.urls')),
 ]
 

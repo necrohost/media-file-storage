@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from core import views
+from . import views
 
 # Create a router and register our ViewSets with it.
 router = DefaultRouter()
