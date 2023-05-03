@@ -30,31 +30,28 @@ export default {
 .link {
   display: flex;
   align-items: center;
-
   cursor: pointer;
   position: relative;
   font-weight: 400;
   user-select: none;
-
-  margin: 0.1em 0;
-  padding: 0.4em;
-  border-radius: 0.25em;
-  height: 1.5em;
-
-  color: white;
+  margin: 0.3em 2px;
+  height: 2em;
+  color: var(--sidebar-text-color);
   text-decoration: none;
 }
-
 .link:hover {
   background-color: var(--sidebar-item-hover);
 }
-
 .link.active {
   background-color: var(--sidebar-item-active);
+  color: var(--sidebar-text-color-active);
+}
+.link.active .icon {
+  color: var(--sidebar-text-color-active);
 }
 .link .icon {
+  color: var(--sidebar-text-color);
   flex-shrink: 0;
-  width: 25px;
-  margin-right: 10px;
+  margin: 0 7px;
 }
 </style>

@@ -138,13 +138,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'cloud')
 MEDIA_URL = '/cloud/'
 
-CORS_ALLOW_HEADERS = "*"
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-]
+
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = "*"
 CORS_ORIGIN_WHITELIST = [
+    'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://192.168.88.103:5173'
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    'http://localhost:5173',
 ]
 
 REST_FRAMEWORK = {

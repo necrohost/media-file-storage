@@ -1,8 +1,7 @@
 <template>
   <div class="app-container">
-    <div>
-      <Navigator />
-    </div>
+    <Header />
+    <Navigator />
     <div :style="{ 'margin-left': sidebarWidth }">
       <RouterView />
     </div>
@@ -12,22 +11,21 @@
 import "@fortawesome/fontawesome-free/js/all";
 import { sidebarWidth } from "./components/navbar/state";
 import Navigator from "@/components/navbar/Navigator.vue";
+import Header from "@/components/Header.vue";
 
 export default {
-  components: { Navigator },
-  data() {
-    return {};
-  },
+  components: { Header, Navigator },
+  data() {},
   mounted() {},
-  methods: {
-    logout() {
-      localStorage.removeItem("token");
-      this.$router.push("/login");
-    },
-  },
+  methods: {},
   setup() {
     return { sidebarWidth };
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.app-container {
+    margin: 0 20px;
+
+}
+</style>

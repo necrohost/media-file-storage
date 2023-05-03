@@ -1,144 +1,127 @@
 <template>
-    <div class="navigator" :style="{ width: sidebarWidth }">
-        <h1>
-            <span v-if="collapsed">
-                <i class="fas fa-cloud"></i>
-            </span>
-            <span v-else>C L O U D</span>
-        </h1>
-        <UploadButton/>
-        <NavLink to="/files" icon="fas fa-box-archive">Files</NavLink>
-        <NavLink to="/shared-files" icon="fas fa-share-nodes">Shared</NavLink>
-        <NavLink to="/trash" icon="fas fa-trash" class="trash">Trash</NavLink>
-        <div class="logout-con">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <button @click="logout" class="logout">Logout</button>
-        </div>
-        <span class="collapse-icon" :class="{ 'rotate-180': collapsed }" @click="toggleNav">
-        <i class="fas fa-angle-double-left"></i>
+  <div class="navigator" id="navbar" :style="{ width: sidebarWidth }">
+    <h1>
+      <i class="fa fa-cloud"></i>
+    </h1>
+    <UploadButton />
+    <NavLink to="/cloud" icon="fas fa-box-archive">Files</NavLink>
+    <NavLink to="/shared-files" icon="fas fa-share-nodes">Shared</NavLink>
+    <NavLink to="/trash" icon="fas fa-trash" class="trash">Trash</NavLink>
+    <LogoutButton />
+    <span
+      class="collapse-icon"
+      :class="{ 'rotate-180': collapsed }"
+      @click="toggleNav"
+    >
+      <i class="fas fa-angle-double-left"></i>
     </span>
-    </div>
+  </div>
 </template>
 <script>
 import UploadButton from "./UploadButton.vue";
 import NavLink from "./NavLink.vue";
-import {collapsed, toggleNav, sidebarWidth} from "./state";
-import { mapActions, mapState } from "vuex";
+import { collapsed, toggleNav, sidebarWidth } from "./state";
+import LogoutButton from "@/components/LogoutButton.vue";
 
 export default {
-    data() {
-        return {
-            token: null
-        };
+  data() {
+    return {};
+  },
+  props: {},
+  components: {
+    NavLink,
+    UploadButton,
+    LogoutButton,
+  },
+  setup() {
+    return {
+      collapsed,
+      toggleNav,
+      sidebarWidth,
+    };
+  },
+  created() {
+    window.addEventListener("scroll", this.handleScroll);
+  },
+  methods: {
+    handleScroll() {
+      if (window.pageYOffset > 0) {
+        document.getElementById("navbar").style.top = "0";
+
+        document.getElementById("navbar").style.bottom = "70px";
+        document.getElementById("navbar").style.borderRadius = "0 0 0 5px";
+      } else {
+        document.getElementById("navbar").style.top = "70px";
+
+        document.getElementById("navbar").style.bottom = "0";
+        document.getElementById("navbar").style.borderRadius = "5px 0 0 0";
+      }
     },
-    props: {},
-    components: {
-        NavLink, UploadButton
-    },
-    setup() {
-        return {
-            collapsed,
-            toggleNav,
-            sidebarWidth,
-        };
-    },
-    methods: {
-        ...mapActions(["logout"]),
-        logout() {
-            // Clear the token from localStorage or any other secure storage mechanism
-            localStorage.removeItem('token');
-            // Redirect to the login page or some other public page
-            this.$router.push('/login');
-        }
-    },
-    mounted() {
-        // Retrieve the token from localStorage or any other secure storage mechanism
-        this.token = localStorage.getItem('token');
-    },
+  },
+  mounted() {
+    window.addEventListener("scroll", this.handleScroll);
+  },
+  unmounted() {
+    window.removeEventListener("scroll", this.handleScroll);
+  },
 };
 </script>
 <style>
 :root {
-    --sidebar-bg-color: #2c3e50;
-    --sidebar-item-hover: #455a64;
-    --sidebar-item-active: #455a64;
-}
-</style>
-<style scoped>
-h1 {
-    text-align: center;
-    margin-bottom: 20px;;
-}
-
-.fa-cloud {
-    font-size: 17px;
-}
-
-.navigator {
-    color: white;
-    background-color: black;
-
-    float: left;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    padding: 0.5em;
-
-    transition: 0.3s ease;
-
-    display: flex;
-    flex-direction: column;
-}
-
-.collapse-icon {
-    position: absolute;
-    bottom: 0;
-    padding: 0.75em;
-
-    color: rgba(255, 255, 255, 0.7);
-
-    transition: 0.2s linear;
-}
-
-.rotate-180 {
-    transform: rotate(180deg);
-    transition: 0.2s linear;
+  --sidebar-bg-color: black;
+  --sidebar-item-active: #ffffff;
+  --sidebar-item-hover: #808080;
+  --sidebar-text-color: #ffffff;
+  --sidebar-text-color-active: #000;
+  --accent-header-color: red;
+    --accent-files-color: black;
 }
 
 button,
 input[type="submit"],
 input[type="reset"] {
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    outline: inherit;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 }
-.logout-con {
-    position: absolute;
-    bottom: 60px;
-    display: inline-block;
-    cursor: pointer;
-    border: 1px solid white;
-    border-radius: 5px;
-    color: white;
-    text-align: center;
-    width: 90%;
-    padding: 6px;
-    font-size: 17px;
-
+</style>
+<style scoped>
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.logout {
-    text-transform: uppercase;
-    margin-left: 6px;
-    color: white;
+.fa-cloud {
+  font-size: 50px;
+  width: 100%;
 }
-.logout-con:active {
-    color: black;
-    background-color: white;
+
+.navigator {
+  color: var(--sidebar-text-color);
+  background-color: var(--sidebar-bg-color);
+  position: fixed;
+  z-index: 1;
+  top: 70px;
+  bottom: 0;
+  padding: 1em;
+  transition: 60ms;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px 0 0 5px;
+}
+
+.collapse-icon {
+  position: absolute;
+  bottom: 0;
+  padding: 0.5em;
+  color: rgba(255, 255, 255, 0.7);
+  transition: 0.2s linear;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+  transition: 0.2s linear;
 }
 </style>

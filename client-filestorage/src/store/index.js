@@ -1,43 +1,66 @@
-import Vuex from "vuex";
+import Vuex, { useStore } from "vuex";
+import { createStore } from "vuex-extensions";
 import api from "@/axios";
 import createPersistedState from "vuex-persistedstate";
 
-export default new Vuex.Store({
+export default createStore(Vuex.Store, {
   plugins: [createPersistedState()],
   state: {
     files: {},
     isAuth: false,
   },
   mutations: {
-    setFiles(state, files) {
+    SET_FILES(state, files) {
       state.files = [...files];
     },
-    hasAuth(state, val) {
+    HAS_AUTH(state, val) {
       state.isAuth = !!val;
+    },
+    DELETE_FILE(state, id) {
+      const index = state.files.findIndex((file) => file.id === id);
+      state.files.splice(index, 1);
     },
   },
   actions: {
+    register({ commit }, { email, username, password }) {
+      return api.
+        post("/register/", { email, username, password}).
+        then((response) => {
+          console.log(response.data)
+      })
+    },
     login({ commit }, { username, password }) {
       return api
-        .post("/token/", { username, password })
+        .post("/login/", { username, password })
         .then((response) => {
           const token = response.data.access;
           localStorage.setItem("token", token);
         })
-        .then(() => commit("hasAuth", true));
+        .then(() => commit("HAS_AUTH", true));
     },
     logout({ commit }) {
-      return api
-        .post("/logout")
-        .then(() => localStorage.removeItem("token"))
-        .then(() => commit("hasAuth", false))
-        .then(this.$router.push("/login"))
-        .catch(console.error);
+      {
+        localStorage.removeItem("token");
+        commit("HAS_AUTH", false);
+        commit("SET_FILES", []);
+      }
+    },
+    getSharedFiles({ commit }) {
+      return api.get("/files/shared/").then((res) => {
+        commit("SET_FILES", res.data);
+        console.log(res);
+      });
     },
     getFiles({ commit }) {
       return api.get("/files.json").then((res) => {
-        commit("setFiles", res.data);
+        commit("SET_FILES", res.data);
         console.log(res);
+      });
+    },
+    deleteFileById({ commit }, file_id) {
+      return api.delete("/files/" + file_id + "/").then((res) => {
+        commit("DELETE_FILE", file_id);
+        return true;
       });
     },
   },

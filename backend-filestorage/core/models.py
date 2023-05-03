@@ -17,5 +17,5 @@ class File(models.Model):
         if not self.pk:
             self.name = self.file.name
             self.size = self.file.size
-            self.ext = os.path.splitext(self.file.name)[1]
+            self.ext = os.path.splitext(self.file.name)[1].lower()
         super().save(*args, **kwargs)

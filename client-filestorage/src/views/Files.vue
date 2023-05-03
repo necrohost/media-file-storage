@@ -1,20 +1,87 @@
 <template>
   <div class="container-files">
-    <div>
-      <table id="tableComponent" class="table table-bordered table-striped">
+    <div class="table-responsive">
+      <table class="table">
         <thead>
           <tr>
-            <!-- loop through each value of the fields to get the table header -->
-            <th v-for="field in fields" :key="field">
+            <th v-for="field in fields" :key="field" scope="col">
               {{ field }}
-              <i class="fas fa-sort"></i>
             </th>
           </tr>
         </thead>
         <tbody>
-          <!-- Loop through the list get the each student data -->
-          <tr v-for="file in userFiles" :key="file">
-            <td v-for="field in fields" :key="field">{{ file[field] }}</td>
+          <tr
+            v-for="file in this.userFiles"
+            :key="file.id"
+            style="vertical-align: middle"
+            class="file-row"
+          >
+            <td v-for="field in Object.keys(fields)" :key="field">
+              <span v-if="field === 'name'">
+                <i
+                  :class="withIcon(file)"
+                  style="
+                    font-size: 30px;
+                    margin-right: 15px;
+                    color: var(--accent-files-color);
+                  "
+                ></i>
+                <span style="font-size: 15px">{{ file.name }}</span>
+              </span>
+              <span v-else-if="field === 'upload_at'">
+                {{ new Date(file.upload_at).toString().slice(0, -32) }}
+              </span>
+              <span v-else-if="field === 'size'">
+                {{ getReadableBytes(file.size) }}
+              </span>
+              <span v-else-if="field === 'shared_link'">
+                <a
+                  :href="'http://localhost:8000/api/s/' + file.shared_link"
+                  v-if="file.shared_link"
+                  ><i icon="fa-solid fa-share-nodes"></i>link</a
+                >
+              </span>
+              <span v-else>{{ file[field] }}</span>
+              <!--                file.ext.replace('.', '')-->
+            </td>
+            <td>
+              <div class="dropdown">
+                <button
+                  class="btn"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a
+                    class="dropdown-item"
+                    href="#download"
+                    @click="downloadFile(file)"
+                    ><i class="fa-solid fa-download"></i> Download</a
+                  >
+                  <a class="dropdown-item" :href="file.file"
+                    ><i class="fa-solid fa-eye"></i> View</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    href="#share"
+                    @click="shareFile(file)"
+                    ><i class="fa-solid fa-share"></i> Share</a
+                  >
+                  <a class="dropdown-item" href="#"
+                    ><i class="fa-solid fa-trash"></i> Delete</a
+                  >
+                  <a class="dropdown-item" href="#" @click="deleteFile(file)"
+                    ><i class="fa-solid fa-square-minus"></i> Permanently
+                    delete</a
+                  >
+                </div>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -23,44 +90,104 @@
 </template>
 
 <script>
-import api from "@/axios";
 import { collapsed, toggleNav } from "@/components/navbar/state";
 import { mapActions, mapState } from "vuex";
+import api from "@/axios";
+import { useRoute } from "vue-router";
+
 export default {
-  name: "FilesPage",
+  name: "Files",
   setup() {
-    const fields = ["name", "upload_at", "size", "ext", "file"];
+    const fields = {
+      name: "Name",
+      upload_at: "Modified",
+      size: "Size",
+      ext: "Format",
+      shared_link: "Share",
+    };
     return { collapsed, toggleNav, fields };
   },
   data() {
     return {
-      info: null,
-      userFiles: {},
+      userFiles: [],
     };
   },
   computed: {
     ...mapState(["files"]),
+    route: () => useRoute(),
   },
   methods: {
-    ...mapActions(["getFiles"]),
-  },
-  created() {
-    this.getFiles().catch((e) => {
-      this.$notify({
-        type: "error",
-        title: "Could not get files, try again later",
-        text: e.message ? e.message : null,
+    ...mapActions(["getFiles", "getSharedFiles", "deleteFileById"]),
+    getReadableBytes(size) {
+      size = Math.round(size / 1024);
+      return size <= 1024 ? size + "kb" : Math.round(size / 1024) + "mb";
+    },
+    withIcon(file) {
+      const ext = file.ext.replace(".", "").toLowerCase();
+      if (["mp3", "flac"].includes(ext)) {
+        return "fa-solid fa-file-audio";
+      }
+      if (["jpg", "png", "svg"].includes(ext)) {
+        return "fa-solid fa-file-image";
+      }
+      if (["avi", "mp4", "3gp", "mkv"].includes(ext)) {
+        return "fa-solid fa-file-video";
+      }
+      if (["pdf", "doc", "xlsx", "xls"].includes(ext)) {
+        return "fa-solid fa-file-lines";
+      }
+    },
+    downloadFile(file) {
+      return api
+        .get(`/files/${file.id}/download/`, {
+          method: "GET",
+          responseType: "blob",
+        })
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", file.name);
+          document.body.appendChild(link);
+          link.click();
+        });
+    },
+    shareFile(file) {
+      return api.get(`/files/${file.id}/share/`).then((res) => {
+        console.log(res.data);
       });
-    });
+    },
+    deleteFile(file) {
+      if (this.$store.dispatch("deleteFileById", file.id)) {
+        this.$store.state.files.splice(file.index, 1);
+      }
+    },
   },
+  watch() {},
   mounted() {
-    this.userFiles = this.files;
+    if (this.route.name === "files") {
+      this.getFiles();
+      this.userFiles = this.files;
+    }
+    if (this.route.name === "shared-files") {
+      this.userFiles = this.files;
+      this.userFiles = this.userFiles.filter(function (file) {
+        return file.shared_link;
+      });
+    }
   },
 };
 </script>
 
 <style scoped>
-h1 {
-  color: #fff;
+.container-files {
+  background-color: #fff;
+  margin-bottom: 70px;
+  padding: 40px;
+  border-radius: 0 5px 5px 0;
+  /*-webkit-box-shadow: -4px -4px 15px 4px rgba(0, 0, 0, 0.1);*/
+  //-moz-box-shadow: -4px -4px 15px 4px rgba(0, 0, 0, 0.1);
+  //box-shadow: -4px -4px 15px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 2px rgba(58, 66, 75, 0.1), 0 2px 4px rgba(58, 66, 75, 0.2);
 }
 </style>

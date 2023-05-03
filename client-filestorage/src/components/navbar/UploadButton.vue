@@ -1,7 +1,6 @@
 <template>
-  <div class="button-container">
+  <div class="upload-container">
     <label class="custom-file-upload">
-      <i class="fa-solid fa-arrow-up-from-bracket"></i>
       <input
         type="file"
         name="file"
@@ -9,6 +8,7 @@
         @change="uploadFile"
         class="my"
       />
+      <i class="fa-solid fa-arrow-up-from-bracket"></i>
       <span v-if="!collapsed">Upload</span>
     </label>
     <div v-if="showProgressBar">
@@ -26,10 +26,10 @@
 <script>
 import axios from "@/axios";
 import { collapsed } from "./state";
-import {useRoute} from "vue-router";
-import {computed} from "vue";
+import { useRoute } from "vue-router";
+import { computed } from "vue";
 export default {
-    setup() {
+  setup() {
     return { collapsed };
   },
   data() {
@@ -67,29 +67,38 @@ export default {
 </script>
 
 <style scoped>
-.button-container {
+.upload-container {
   width: 100%;
   margin-bottom: 20px;
 }
+
 .my {
   position: absolute;
+  display: none;
   top: 0;
   left: 0;
   opacity: 0;
   cursor: pointer;
 }
-
+.upload-container span {
+    margin-left: 5px;
+}
 .custom-file-upload {
   display: inline-block;
   cursor: pointer;
   border: 1px solid white;
-  border-radius: 5px;
   color: white;
   text-align: center;
   width: 97%;
   padding: 6px;
-  font-size: 17px;
   text-transform: uppercase;
+}
+.custom-file-upload:hover {
+  color: black;
+  background-color: white;
+  border-radius: 3px;
+  transition: 0.2s ease;
+  box-shadow: 0 0 1px 0 white inset, 0 0 1px 0 white;
 }
 
 .custom-file-upload:active {

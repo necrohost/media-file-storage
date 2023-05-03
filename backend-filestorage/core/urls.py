@@ -12,12 +12,15 @@ router = DefaultRouter()
 router.register(r'files', views.FileViewSet, basename='file')
 router.register(r'users', views.UserViewSet, basename='user')
 
-shared_file_detail = views.FileViewSet.as_view({'get': 'shared_file'})
-
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('s/<str:uuid>', shared_file_detail, name='shared-file-detail'),
+
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain'),
+    path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('register/', views.RegisterView.as_view(), name='auth_register'),
+    path('whoami/', views.UserViewSet.as_view({'get': 'whoami'}), name='whoami'),
+
+    path('files/<int:pk>/download/', views.FileViewSet.as_view({'get': 'download'})),
+    path('s/<str:uuid>', views.FileViewSet.as_view({'get': 'shared_file'}), name='shared-file-detail'),
 ]
