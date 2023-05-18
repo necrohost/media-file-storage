@@ -44,10 +44,14 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { useUserStore } from "@/stores/user";
 
 export default {
   name: "Register",
+  setup() {
+    const user = useUserStore();
+    return { user };
+  },
   data() {
     return {
       email: "",
@@ -56,16 +60,11 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["register"]),
     submit() {
-      this.register({
-        email: this.email,
-        username: this.username,
-        password: this.password,
-      }).then(() => this.$router.push("/login"));
+      this.user
+        .register(this.email, this.username, this.password)
+        .then(() => this.$router.push("/login"));
     },
   },
 };
 </script>
-
-<style scoped></style>

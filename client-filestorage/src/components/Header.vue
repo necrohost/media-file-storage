@@ -88,6 +88,7 @@
 .search {
   margin-left: 40px;
 }
+
 .search input {
   border-radius: 30px;
   box-shadow: 0 0 1px 0 white inset, 0 0 1px 0 white;
@@ -117,7 +118,6 @@
   text-decoration: none;
   display: block;
   text-align: center;
-  width: 50px;
   color: black;
 }
 .list-apps a:hover {

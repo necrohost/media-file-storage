@@ -1,17 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import HomeView from "../views/HomeView.vue";
 import Files from "../views/Files.vue";
 import Login from "../views/auth/Login.vue";
 import Register from "../views/auth/Register.vue";
-import Uploader from "@/components/navbar/UploadButton.vue";
-import store from "@/store";
+import { useUserStore } from "@/stores/user";
 
 /**
  * @property {boolean} requiresAuth
  * @property {array} routes
  *
  */
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -19,14 +18,6 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: Files,
-      meta: {
-        requiresAuth: true,
-      },
-    },
-    {
-      path: "/upload",
-      name: "upload",
-      component: Uploader,
       meta: {
         requiresAuth: true,
       },
@@ -42,6 +33,14 @@ const router = createRouter({
     {
       path: "/shared-files",
       name: "shared-files",
+      component: Files,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/trash",
+      name: "trash",
       component: Files,
       meta: {
         requiresAuth: true,
@@ -65,16 +64,14 @@ const router = createRouter({
     },
   ],
 });
-router.beforeEach((to, from, next) => {
-  if (to.matched.some((route) => route.meta.requiresAuth)) {
-    if (!store.state.isAuth) {
-      next("/login");
-    } else {
-      next();
-    }
-  } else {
-    next();
-  }
+router.beforeEach((to, from) => {
+  const user = useUserStore();
+  console.log(user.isAuth);
+  if (to.meta.requiresAuth && !user.isAuth)
+    return {
+      path: "/login",
+      query: { redirect: to.fullPath },
+    };
 });
 
 export default router;

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'drf_spectacular',
     # local
     'core'
 ]
@@ -57,8 +58,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     # 3rd
     'corsheaders.middleware.CorsMiddleware',
-    # local
-    # 'core.middlewares.JWTMiddleware'
 ]
 
 ROOT_URLCONF = 'filestorage.urls'
@@ -117,11 +116,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -134,22 +130,20 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# media folder
+# MEDIA FOLDER
 MEDIA_ROOT = os.path.join(BASE_DIR, 'cloud')
 MEDIA_URL = '/cloud/'
 
-
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS
 CORS_ALLOW_HEADERS = "*"
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://192.168.88.103:5173'
-]
+CORS_ALLOWED_ORIGINS = (
+    "http://localhost:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8000",
+)
 
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    'http://localhost:5173',
-]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
@@ -157,17 +151,25 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.IsAdminUser'
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'self-filestorage API Project',
+    'DESCRIPTION': 'A simple filestorage api for self-hosted serv',
+    'VERSION': '1.0.0'
 }
 
 SIMPLE_JWT = {
-    "AUTH_HEADER_TYPES": ("Bearer", "JWT"),
+    "AUTH_HEADER_TYPES": "Bearer",
     'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
     'ROTATE_REFRESH_TOKENS': True,
 }
+

@@ -3,7 +3,7 @@
     <Header />
     <Navigator />
     <div :style="{ 'margin-left': sidebarWidth }">
-      <RouterView />
+      <RouterView :key="$route.fullPath" />
     </div>
   </div>
 </template>
@@ -25,7 +25,6 @@ export default {
 </script>
 <style scoped>
 .app-container {
-    margin: 0 20px;
-
+  margin: 0 20px;
 }
 </style>

@@ -2,9 +2,18 @@
   <div class="container-files">
     <div class="table-responsive">
       <table class="table">
+        <caption>
+          Files
+        </caption>
         <thead>
           <tr>
-            <th v-for="field in fields" :key="field" scope="col">
+            <th
+              v-for="field in fields"
+              :key="field"
+              scope="col"
+              data-sortable="true"
+              data-sorter="alphanum"
+            >
               {{ field }}
             </th>
           </tr>
@@ -29,7 +38,7 @@
                 <span style="font-size: 15px">{{ file.name }}</span>
               </span>
               <span v-else-if="field === 'upload_at'">
-                {{ new Date(file.upload_at).toString().slice(0, -32) }}
+                {{ new Date(file.created_at).toString().slice(0, -32) }}
               </span>
               <span v-else-if="field === 'size'">
                 {{ getReadableBytes(file.size) }}
@@ -91,21 +100,22 @@
 
 <script>
 import { collapsed, toggleNav } from "@/components/navbar/state";
-import { mapActions, mapState } from "vuex";
 import api from "@/axios";
 import { useRoute } from "vue-router";
+import { useFileStore } from "@/stores/file";
 
 export default {
   name: "Files",
   setup() {
+    const file = useFileStore();
     const fields = {
       name: "Name",
-      upload_at: "Modified",
+      created_at: "Modified",
       size: "Size",
       ext: "Format",
       shared_link: "Share",
     };
-    return { collapsed, toggleNav, fields };
+    return { file, collapsed, toggleNav, fields };
   },
   data() {
     return {
@@ -113,11 +123,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(["files"]),
     route: () => useRoute(),
   },
   methods: {
-    ...mapActions(["getFiles", "getSharedFiles", "deleteFileById"]),
     getReadableBytes(size) {
       size = Math.round(size / 1024);
       return size <= 1024 ? size + "kb" : Math.round(size / 1024) + "mb";
@@ -136,6 +144,9 @@ export default {
       if (["pdf", "doc", "xlsx", "xls"].includes(ext)) {
         return "fa-solid fa-file-lines";
       }
+      if (["zip", "rar", "7z", "tar"].includes(ext)) {
+        return "fa-solid fa-file-archive";
+      }
     },
     downloadFile(file) {
       return api
@@ -153,28 +164,29 @@ export default {
         });
     },
     shareFile(file) {
-      return api.get(`/files/${file.id}/share/`).then((res) => {
+      return api.post(`/files/${file.id}/share/`).then((res) => {
         console.log(res.data);
       });
     },
     deleteFile(file) {
-      if (this.$store.dispatch("deleteFileById", file.id)) {
-        this.$store.state.files.splice(file.index, 1);
+      if (this.file.deleteFile(file.id)) {
+        return console.log("deleted file");
       }
     },
   },
-  watch() {},
   mounted() {
     if (this.route.name === "files") {
-      this.getFiles();
-      this.userFiles = this.files;
+      this.userFiles = this.file.files;
     }
-    if (this.route.name === "shared-files") {
-      this.userFiles = this.files;
-      this.userFiles = this.userFiles.filter(function (file) {
-        return file.shared_link;
-      });
+    // if (this.route.name === "shared-files") {
+    //   this.userFiles = this.file.shared_files;
+    // }
+    if (this.route.name === "trash") {
+      this.userFiles = this.deleted_files;
     }
+  },
+  created() {
+    this.file.getFiles();
   },
 };
 </script>
@@ -183,11 +195,14 @@ export default {
 .container-files {
   background-color: #fff;
   margin-bottom: 70px;
+  min-height: 100vh;
   padding: 40px;
   border-radius: 0 5px 5px 0;
   /*-webkit-box-shadow: -4px -4px 15px 4px rgba(0, 0, 0, 0.1);*/
-  //-moz-box-shadow: -4px -4px 15px 4px rgba(0, 0, 0, 0.1);
-  //box-shadow: -4px -4px 15px 4px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 2px rgba(58, 66, 75, 0.1), 0 2px 4px rgba(58, 66, 75, 0.2);
+  //-moz-box-shadow: -4px -4px 15px 4px rgba(0, 0, 0, 0.1); //box-shadow: -4px -4px 15px 4px rgba(0, 0, 0, 0.1); box-shadow: 0 0 2px rgba(58, 66, 75, 0.1), 0 2px 4px rgba(58, 66, 75, 0.2);
+}
+
+.table-responsive {
+  min-height: 100vh;
 }
 </style>

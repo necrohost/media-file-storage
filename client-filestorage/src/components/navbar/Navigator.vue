@@ -74,7 +74,7 @@ export default {
   --sidebar-text-color: #ffffff;
   --sidebar-text-color-active: #000;
   --accent-header-color: red;
-    --accent-files-color: black;
+  --accent-files-color: black;
 }
 
 button,

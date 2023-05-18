@@ -38,11 +38,14 @@
 </template>
 
 <script>
-// import api from '@/axios';
-import { mapActions } from "vuex";
+import { useUserStore } from "@/stores/user";
 
 export default {
   name: "Login",
+  setup() {
+    const user = useUserStore();
+    return { user };
+  },
   data() {
     return {
       username: "",
@@ -50,9 +53,9 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["login"]),
     submit() {
-      this.login({ username: this.username, password: this.password })
+      this.user
+        .login(this.username, this.password)
         .then(() => this.$router.push("/files"))
         .catch((e) => {
           this.$notify({
@@ -65,4 +68,3 @@ export default {
   },
 };
 </script>
-<style scoped></style>

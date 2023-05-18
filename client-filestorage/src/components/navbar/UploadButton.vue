@@ -81,7 +81,7 @@ export default {
   cursor: pointer;
 }
 .upload-container span {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 .custom-file-upload {
   display: inline-block;

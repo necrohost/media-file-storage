@@ -7,20 +7,22 @@
   </div>
 </template>
 <script>
-import { mapActions } from "vuex";
 import { collapsed } from "@/components/navbar/state";
+import { useUserStore } from "@/stores/user";
 
 export default {
+  setup() {
+    const user = useUserStore();
+    return { user };
+  },
   data() {
     return {
       collapsed,
     };
   },
   methods: {
-    ...mapActions(["logout"]),
     submitLogout() {
-      this.logout();
-      localStorage.removeItem("token");
+      this.user.logout();
       this.$router.push("/login");
     },
   },
@@ -31,9 +33,11 @@ export default {
   width: 100%;
   margin-bottom: 20px;
 }
+
 .logout-container span {
-    margin-left: 5px;
+  margin-left: 5px;
 }
+
 .logout-container a {
   margin-top: 20px;
   display: inline-block;
@@ -45,6 +49,7 @@ export default {
   padding: 6px;
   text-transform: uppercase;
 }
+
 .logout-container a:hover {
   color: black;
   background-color: white;
