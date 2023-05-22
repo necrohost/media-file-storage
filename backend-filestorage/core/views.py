@@ -1,8 +1,10 @@
 import socket
 import uuid
+import mimetypes
 
 from django.contrib.auth.models import User
 from django.http import FileResponse
+from django.utils.text import slugify
 from rest_framework import viewsets, generics
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import action
@@ -17,22 +19,24 @@ from .services.file_service import get_file
 
 
 class FileViewSet(viewsets.ModelViewSet):
-    queryset = File.objects.exclude(is_deleted=True).all().order_by('-created_at')
+    # .exclude(is_deleted=True)
+    queryset = File.objects.all().order_by('-created_at')
     serializer_class = FileSerializer
-    permission_classes = [IsOwnerOrShared]
-
-    authentication_classes = [JWTAuthentication, TokenAuthentication, SessionAuthentication]
+    authentication_classes = [JWTAuthentication]
 
     def get_queryset(self):
         return self.queryset.filter(owner_id=self.request.user.id)
 
-    @action(methods=['get'], detail=True)
+    @action(methods=['GET'], detail=True, permission_classes=[IsOwnerOrShared])
     def download(self, request, *args, **kwargs):
         download_obj_file = get_file(**kwargs)
         file_handle = download_obj_file.file.open()
-        response = FileResponse(file_handle, content_type='whatever')
+        file_mime, _ = mimetypes.guess_type(download_obj_file.file.name)
+        response = FileResponse(file_handle,
+                                content_type=file_mime,
+                                as_attachment=True,
+                                filename=download_obj_file.name)
         response['Content-Length'] = download_obj_file.file.size
-        response['Content-Disposition'] = 'attachment; filename="%s"' % download_obj_file.file.name
         return response
 
     @action(detail=True, methods=['POST'])
@@ -40,7 +44,7 @@ class FileViewSet(viewsets.ModelViewSet):
         shared_file = self.get_object()
         shared_file.shared_link = uuid.uuid4().hex
         shared_file.save()
-        return Response(shared_file.shared_link)
+        return Response({'link': shared_file.shared_link})
 
     @action(detail=True, methods=['POST'])
     def set_soft_delete(self, request, *args, **kwargs):

@@ -1,4 +1,4 @@
-import { defineStore, acceptHMRUpdate } from "pinia";
+import {acceptHMRUpdate, defineStore} from "pinia";
 import api from "@/axios";
 
 export const useFileStore = defineStore({
@@ -9,7 +9,7 @@ export const useFileStore = defineStore({
   }),
   persist: true,
   getters: {
-    // shared_files: () => this.files.map((file) => file.shared_link),
+
   },
   actions: {
     getFiles() {
@@ -19,6 +19,17 @@ export const useFileStore = defineStore({
     },
     deleteFile(file_id) {
       return api.delete("/files/" + file_id + "/").then((res) => {
+        if (res.status === 204) {
+          const index = this.state.files.findIndex(
+            (file) => file.id === file_id
+          );
+          this.state.files.splice(index, 1);
+          return true;
+        }
+      });
+    },
+    softDeleteFile(file_id) {
+      return api.post("/files/" + file_id + "/set_soft_delete/").then((res) => {
         if (res.status === 204) {
           const index = this.state.files.findIndex(
             (file) => file.id === file_id

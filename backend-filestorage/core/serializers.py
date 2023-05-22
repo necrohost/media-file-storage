@@ -16,7 +16,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('email', 'username', 'password')
 
     def create(self, validated_data):
-        user = User.objects.create(username=validated_data['username'], email=validated_data['email'],)
+        user = User.objects.create(username=validated_data['username'], email=validated_data['email'], )
         user.set_password(validated_data['password'])
         user.save()
         return user
@@ -31,5 +31,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class FileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = File
-        fields = ('id', 'url', 'name', 'size', 'file', 'ext', 'is_deleted', 'deleted_at', 'created_at', 'shared_link', 'encrypted', 'owner')
-        read_only_fields = ('id', 'url', 'name', 'size', 'ext', 'created_at', 'owner')
+        fields = ('id', 'url', 'name',
+                  'size', 'file', 'ext',
+                  'is_deleted', 'deleted_at',
+                  'created_at', 'shared_link',
+                  'encrypted', 'owner')
+
+        read_only_fields = ('name', 'owner', 'size',
+                            'ext', 'is_deleted', 'created_at',
+                            'deleted_at', 'updated_at', 'encrypted')

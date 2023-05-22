@@ -7,7 +7,7 @@ from .views import FileViewSet, RegisterView, UserViewSet, DeletedFileViewSet
 # Create a router and register our ViewSets with it.
 router = DefaultRouter()
 router.register(r'files', FileViewSet, basename='file')
-router.register(r'deleted-files', DeletedFileViewSet, basename='deleted-file')
+router.register(r'deleted-files', DeletedFileViewSet, basename='deleted_file')
 router.register(r'users', UserViewSet, basename='user')
 
 # The API URLs are now determined automatically by the router.
@@ -19,9 +19,7 @@ urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='auth_register'),
     path('auth/whoami/', UserViewSet.as_view({'get': 'whoami'}), name='whoami'),
 
-    # path('files/deleted/', DeletedFileViewSet.as_view({'get': 'list'}), name='deleted-files'),
-    path('files/<int:pk>/download/', FileViewSet.as_view({'get': 'download'}), name='download-file'),
-    path('s/<str:link>', FileViewSet.as_view({'get': 'download'}), name='download-shared-file'),
+    path('files/<int:pk>/download/', FileViewSet.as_view({'get': 'download'}), name='download_file'),
 ]
 urlpatterns += [
     path('api-auth/', include('rest_framework.urls')),

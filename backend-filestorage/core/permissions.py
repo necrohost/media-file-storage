@@ -12,5 +12,8 @@ class IsOwnerOrShared(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
+        if obj.shared_link == request['shared_link']:
+            return True
+
         # Write permissions are only allowed to the owner of the snippet.
         return obj.owner == request.user
