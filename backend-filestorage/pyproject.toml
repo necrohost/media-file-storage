@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "backend_filestorage"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.7,<4.0"
 django = "*"
 djangorestframework = "*"
 django-cors-headers = "*"
