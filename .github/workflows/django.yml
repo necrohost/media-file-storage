@@ -55,6 +55,8 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
-          coverageCommand: pytest --cov=core --cov=filestorage --cov-report xml
+          run: |
+            cd ../backend-filestorage
+          coverageCommand: poetry run pytest --cov=core --cov=filestorage --cov-report xml
           debug: true
 
