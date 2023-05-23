@@ -125,10 +125,10 @@ export default {
     computed: {
         route: () => useRoute(),
         filtered_files() {
-            return Object.values(this.file.files).filter((file) => file.is_deleted === false)
+            return Object.values(this.file.files).filter((file) => !file.is_deleted)
         },
         shared_files() {
-            return Object.values(this.file.files).filter((file) => file.shared_link && file.is_deleted === false)
+            return Object.values(this.file.files).filter((file) => file.shared_link && !file.is_deleted)
         },
         deleted_files() {
             return Object.values(this.file.files).filter((file) => file.is_deleted)

@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "backend-filestorage"
+version = "0.1.0"
+description = ""
+authors = ["necrohost <kirpub@ya.ru>"]
+readme = "README.md"
+packages = [{include = "backend_filestorage"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "*"
+djangorestframework = "*"
+django-cors-headers = "*"
+django-cryptography = "*"
+djangorestframework-simplejwt = "*"
+django-filter = "*"
+python-dotenv = "*"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-django = "*"
+flake8 = "^6.0.0"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
