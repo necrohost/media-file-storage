@@ -42,6 +42,10 @@ jobs:
           pip install --upgrade pip
           pip install poetry
           poetry install
+      - name: Run migrates
+        run: |
+          python manage.py makemigrations
+          python manage.py migrate
       - name: Run pytest
         run: |
           poetry run pytest
