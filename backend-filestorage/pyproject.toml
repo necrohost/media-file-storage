@@ -14,7 +14,6 @@ django-cryptography = "*"
 djangorestframework-simplejwt = "*"
 django-filter = "*"
 python-dotenv = "*"
-psycopg2-binary = "^2.9.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
