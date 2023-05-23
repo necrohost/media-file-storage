@@ -21,6 +21,8 @@ pytest = "*"
 pytest-django = "*"
 flake8 = "^6.0.0"
 drf-spectacular = "^0.26.2"
+pytest-cov = "^4.0.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
